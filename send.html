@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <?!= include('style'); ?>
+
+    <style>
+        .loginbody {
+            text-align: center;
+        }
+
+        .login-form input {
+            width: 100%;
+        }
+
+        .login-button-div {
+            text-align: right;
+        }
+
+        .branding-below {
+            bottom: 56px;
+            top: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .full-width {
+            width: 100%
+        }
+
+        .content {
+            width: 70%;
+            margin-left: calc((100% - 70%) / 2);
+            text-align: initial;
+        }
+    </style>
+</head>
+
+<body class="loginbody">
+    <div class="sidebar branding-below">
+        <img src="https://filepickertdsmaker.blob.core.windows.net/filepickercontainer/5aab63da5f318bba094e374d/1540631331706.png"
+            height="60px" width="auto">
+        <h2 class="gray">Create or Update Datasheets</h2>
+
+        <p class="secondary">After you changed the data, just click to button to update or create your datasheets.</p>
+
+        <div class="content">
+            <div class="block">
+                <button class="blue full-width" type="button" id="parse-button">Update Datasheet</button>
+            </div>
+            <div class="block">
+                <span class="error hidden" id="error-message">Fail message here.</span>
+            </div>
+        </div>
+
+    </div>
+    <div class="sidebar bottom">
+        <span class="gray" id="copyright-text">TDSMaker</span>
+    </div>
+
+    <script type="text/javascript">
+        // document ready, get things done!
+        window.addEventListener('load', function (e) {
+
+            document.getElementById('copyright-text')
+                .append(' © ' + (new Date()).getFullYear());
+
+            document.getElementById('parse-button').addEventListener('click', function (e) {
+                e.preventDefault();
+                parseData(this);
+            })
+        });
+
+        function parseData(btn) {
+            btn.disabled = true;
+            google.script.run.withSuccessHandler(onSuccess)
+                .withFailureHandler(onError)
+                .parseSpreadsheetData();
+        }
+
+        function onSuccess(resp) {
+            document.getElementById('parse-button').disabled = false;
+            console.log(resp);
+            console.log(JSON.stringify(resp));
+        }
+
+        function onError(err) {
+            document.getElementById('parse-button').disabled = false;
+            showError(err.message);
+        }
+
+        function hideError() {
+            const elem = document.getElementById('error-message');
+            elem.classList.add('hidden');
+
+            return true;
+        }
+
+        function showError(msg) {
+            const elem = document.getElementById('error-message');
+            elem.innerText = msg;
+            elem.classList.remove('hidden');
+
+            return true;
+        }
+    </script>
+</body>
+
+</html>

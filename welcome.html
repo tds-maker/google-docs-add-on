@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <?!= include('style'); ?>
+
+    <style>
+        .loginbody{ 
+            text-align: center;
+        }
+
+        .login-form { 
+            width: 200px;
+            margin-left: calc((100% - 200px) / 2);
+            text-align: initial;
+        }
+
+        .login-form input {
+            width: 100%;
+        }
+
+        .login-button-div {
+            text-align: right;
+        }
+
+        .branding-below {
+            bottom: 56px;
+            top: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .full-width { 
+            width: 100%
+        }
+    </style>
+</head>
+
+<body class="loginbody">
+    <div class="sidebar branding-below">
+        <img src="https://filepickertdsmaker.blob.core.windows.net/filepickercontainer/5aab63da5f318bba094e374d/1540631331706.png"
+            height="60px" width="auto">
+        <h2 class="gray">TDSMaker Excel Importer</h2>
+        <p>You need to log in your TDSMaker account to get your template list.</p>
+        <form name="loginform" class="login-form" id="login-form">
+            <div class="block form-group">
+                <label for="email">E-Mail</label>
+                <input type="email" id="email" name="email">
+            </div>
+
+            <div class="block form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password">
+            </div>
+
+            <div class="block">
+                <span class="error hidden" id="error-message">Fail message here.</span>
+            </div>
+
+            <div class="block login-button-div">
+                <button class="blue full-width" type="submit">Log In</button>
+            </div>
+        </form>
+    </div>
+    <div class="sidebar bottom">
+        <span class="gray" id="copyright-text">TDSMaker</span>
+    </div>
+
+    <script type="text/javascript">
+        // document ready, get things done!
+        window.addEventListener('load', function (e) {
+
+            document.getElementById('login-form')
+                .addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    tryLogin(this);
+                }, true);
+
+            document.getElementById('copyright-text')
+                .append(' © ' + (new Date()).getFullYear());
+        });
+
+        function tryLogin(form) {
+            hideError();
+            disableInputs(form);
+
+            var email = form.email.value.trim();
+            var password = form.password.value.trim();
+
+            try {
+                google.script.run.withSuccessHandler(onSuccess)
+                    .withFailureHandler(onError)
+                    .withUserObject(form)
+                    .apiLogin(email, password);
+            } catch (e) {
+                enableInputs(form);
+                showError(e.message);
+            }
+        }
+
+        function onSuccess(resp, form) {
+            console.log("auth success, redirecting...");
+        }
+
+        function onError(err, form) {
+            enableInputs(form);
+            showError(err.message);
+        }
+
+        function disableInputs(form) {
+            for (var i = 0; i < form.elements.length; i++) {
+                form.elements[i].disabled = true;
+            };
+
+            return true;
+        }
+
+        function enableInputs(form) {
+            for (var i = 0; i < form.elements.length; i++) {
+                form.elements[i].disabled = false;
+            };
+
+            return true;
+        }
+
+        function hideError() {
+            const elem = document.getElementById('error-message');
+            elem.classList.add('hidden');
+
+            return true;
+        }
+
+        function showError(msg) {
+            const elem = document.getElementById('error-message');
+            elem.innerText = msg;
+            elem.classList.remove('hidden');
+
+            return true;
+        }
+    </script>
+</body>
+
+</html>
